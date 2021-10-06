@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/nacos_server/nacos_server.iml" filepath="$PROJECT_DIR$/nacos_server/nacos_server.iml" />
+      <module fileurl="file://$PROJECT_DIR$/nfspeed.iml" filepath="$PROJECT_DIR$/nfspeed.iml" />
+    </modules>
+  </component>
+</project>

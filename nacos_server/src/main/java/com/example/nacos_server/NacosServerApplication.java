@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class NacosServerApplication {
 
     public static void main(String[] args) {
+        //test
         SpringApplication.run(NacosServerApplication.class, args);
     }
 

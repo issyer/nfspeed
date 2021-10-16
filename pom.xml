@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.example</groupId>
     <artifactId>nfspeed</artifactId>
-    <version>0.0.1</version>
+    <version>${nfspeed.version}</version>
     <name>nfspeed</name>
     <description>NeedForSpeed Project For Spring Cloud</description>
 
@@ -19,15 +19,23 @@
     <!--模块管理-->
     <modules>
         <module>nacos_server</module>
+        <module>common</module>
     </modules>
 
     <!--统一依赖版本号管理-->
     <properties>
+        <nfspeed.version>1.0</nfspeed.version>
+        <spring-boot.version>2.1.7.RELEASE</spring-boot.version>
         <java.version>1.8</java.version>
         <spring.cloud.alibaba.version>2.2.1.RELEASE</spring.cloud.alibaba.version>
         <spring.cloud.version>Hoxton.SR3</spring.cloud.version>
+        <tomcat-embed-jasper.version>7.0.59</tomcat-embed-jasper.version>
+        <nacos.config.version>2.0.3</nacos.config.version>
+        <nacos-naming.version>2.0.3</nacos-naming.version>
+        <nacos-istio.version>2.0.3</nacos-istio.version>
         <lombok.version>1.18.20</lombok.version>
-
+        <slf4j.version>1.7.26</slf4j.version>
+        <hutool.version>4.5.16</hutool.version>
     </properties>
 
     <!--父级依赖管理-->
@@ -35,6 +43,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
         <dependency>

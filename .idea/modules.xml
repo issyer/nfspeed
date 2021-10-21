@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gateway/gateway.iml" filepath="$PROJECT_DIR$/gateway/gateway.iml" />
       <module fileurl="file://$PROJECT_DIR$/nacos_server/nacos_server.iml" filepath="$PROJECT_DIR$/nacos_server/nacos_server.iml" />
       <module fileurl="file://$PROJECT_DIR$/nfspeed.iml" filepath="$PROJECT_DIR$/nfspeed.iml" />
     </modules>

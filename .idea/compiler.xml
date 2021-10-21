@@ -9,10 +9,12 @@
         <outputRelativeToContentRoot value="true" />
         <module name="common" />
         <module name="nacos_server" />
+        <module name="gateway" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="common" target="1.8" />
+      <module name="gateway" target="1.8" />
       <module name="nacos_server" target="1.8" />
       <module name="nfspeed" target="1.8" />
       <module name="test" target="1.8" />
@@ -21,6 +23,7 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="common" options="-parameters" />
+      <module name="gateway" options="-parameters" />
       <module name="nacos_server" options="-parameters" />
     </option>
   </component>

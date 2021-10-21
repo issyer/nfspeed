@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.5.5</version>
+        <version>2.3.2.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.example</groupId>
@@ -20,15 +20,16 @@
     <modules>
         <module>nacos_server</module>
         <module>common</module>
+        <module>gateway</module>
     </modules>
 
     <!--统一依赖版本号管理-->
     <properties>
         <nfspeed.version>1.0</nfspeed.version>
-        <spring-boot.version>2.1.7.RELEASE</spring-boot.version>
+        <spring-boot.version>2.2.2.RELEASE</spring-boot.version>
         <java.version>1.8</java.version>
-        <spring.cloud.alibaba.version>2.2.1.RELEASE</spring.cloud.alibaba.version>
-        <spring.cloud.version>Hoxton.SR3</spring.cloud.version>
+        <spring.cloud.alibaba.version>2.2.5.RELEASE</spring.cloud.alibaba.version>
+        <spring.cloud.version>Hoxton.SR8</spring.cloud.version>
         <tomcat-embed-jasper.version>7.0.59</tomcat-embed-jasper.version>
         <nacos.config.version>2.0.3</nacos.config.version>
         <nacos-naming.version>2.0.3</nacos-naming.version>
@@ -50,6 +51,10 @@
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -90,7 +95,32 @@
         </pluginRepository>
     </pluginRepositories>
 
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <profiles.active>dev</profiles.active>
+                <nacos.server-addr>localhost:8848</nacos.server-addr>
+                <nacos.username>nacos</nacos.username>
+                <nacos.password>nacos</nacos.password>
+            </properties>
+            <activation>
+                <!-- 默认环境 -->
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+
+
+    </profiles>
+
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

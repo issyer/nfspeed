@@ -31,9 +31,9 @@
         <spring.cloud.alibaba.version>2.2.5.RELEASE</spring.cloud.alibaba.version>
         <spring.cloud.version>Hoxton.SR8</spring.cloud.version>
         <tomcat-embed-jasper.version>7.0.59</tomcat-embed-jasper.version>
-        <nacos.config.version>2.0.3</nacos.config.version>
-        <nacos-naming.version>2.0.3</nacos-naming.version>
-        <nacos-istio.version>2.0.3</nacos-istio.version>
+        <nacos.config.version>2.0.2</nacos.config.version>
+        <nacos-naming.version>2.0.2</nacos-naming.version>
+        <nacos-istio.version>2.0.2</nacos-istio.version>
         <lombok.version>1.18.20</lombok.version>
         <slf4j.version>1.7.26</slf4j.version>
         <hutool.version>4.5.16</hutool.version>

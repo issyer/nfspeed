@@ -19,8 +19,9 @@
     <!--模块管理-->
     <modules>
         <module>nacos_server</module>
-        <module>common</module>
+        <module>commonutil</module>
         <module>gateway</module>
+        <module>report</module>
     </modules>
 
     <!--统一依赖版本号管理-->
@@ -37,7 +38,7 @@
         <lombok.version>1.18.20</lombok.version>
         <slf4j.version>1.7.26</slf4j.version>
         <hutool.version>4.5.16</hutool.version>
-        <javamail.version>1.4.5</javamail.version>
+        <javamail.version>1.6.2</javamail.version>
     </properties>
 
     <!--父级依赖管理-->
@@ -47,10 +48,10 @@
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-starter-security</artifactId>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>org.springframework.cloud</groupId>

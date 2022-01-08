@@ -43,6 +43,11 @@
             <artifactId>hutool-all</artifactId>
             <version>${hutool.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>commonutil</artifactId>
+            <version>1.0</version>
+        </dependency>
 
 
     </dependencies>

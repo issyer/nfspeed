@@ -1,4 +1,4 @@
-package com.example.common.util.mail;
+package com.example.commonutil.util.mail;
 
 import lombok.Data;
 

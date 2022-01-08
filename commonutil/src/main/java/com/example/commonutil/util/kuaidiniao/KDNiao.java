@@ -1,4 +1,4 @@
-package com.example.common.util.kuaidiniao;
+package com.example.commonutil.util.kuaidiniao;
 
 import cn.hutool.http.HttpUtil;
 

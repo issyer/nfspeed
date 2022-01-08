@@ -1,4 +1,4 @@
-package com.example.common.util.mail;
+package com.example.commonutil.util.mail;
 
 import com.sun.mail.imap.IMAPFolder;
 
@@ -377,7 +377,7 @@ public class EmailClient {
             }
             String nick = "";
             try {
-                nick = javax.mail.internet.MimeUtility.encodeText(email.getFrom().getUserName());
+                nick = MimeUtility.encodeText(email.getFrom().getUserName());
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }

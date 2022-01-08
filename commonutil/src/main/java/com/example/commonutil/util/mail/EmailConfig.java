@@ -1,10 +1,11 @@
-package com.example.common.util.mail;
+package com.example.commonutil.util.mail;
 
 import lombok.Data;
-import org.apache.log4j.Logger;
 
 import java.io.InputStream;
 import java.util.Properties;
+
+//import org.apache.log4j.Logger;
 
 /**
  * 邮件配置类，具体配置信息请额外写在一个email.properties文件中，并将该文件放在resources下的properties文件夹中
@@ -15,7 +16,7 @@ import java.util.Properties;
 @Data
 public class EmailConfig {
 
-    private  final Logger logger = Logger.getLogger(EmailConfig.class);
+//    private  final Logger logger = Logger.getLogger(EmailConfig.class);
 
     private String MAIL_DEBUT = "mail.debug";
     private   String MAIL_SMTP_AUTH = "mail.smtp.auth";
@@ -129,7 +130,7 @@ public class EmailConfig {
             receiveSessionProperties.setProperty(MAIL_RECEIVE_HOST, receive_host);
             receiveSessionProperties.setProperty(MAIL_DEBUT, debug);
         } catch (Exception e) {
-            logger.error("邮箱配置信息初始化异常", e);
+//            logger.error("邮箱配置信息初始化异常", e);
         }
     }
 

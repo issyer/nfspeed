@@ -3,42 +3,35 @@ package com.example.commonutil.util.request;
 import lombok.Data;
 
 @Data
-public class R {
+public class R<T> {
 
     private Integer code;
     private String msg;
-    private Object data;
+    private T data;
 
-    public R(){
+    public R(){}
 
+    public R(Integer code,String msg,T data){
+        this.code = code;
+        this.msg = msg;
+        this.data = data;
     }
 
-    public static R ok(){
-        R r = new R();
-        r.setCode(0);
-        r.setMsg("success");
-        return r;
+    public static <T> R<T> ok() {
+        return new R<T>(0, "success", null);
     }
 
-    public static R ok(Object data){
-        R r = new R();
-        r.setCode(0);
-        r.setMsg("success");
-        r.setData(data);
-        return r;
+    public static <T> R<T> ok(T data) {
+        return new R<T>(0, "success", data);
     }
 
-    public static R error(){
-        R r = new R();
-        r.setCode(-1);
-        r.setMsg("error");
-        return r;
+    public static <T> R<T> error() {
+        return new R<T>(-1, "error", null);
     }
 
-    public static R error(Integer code,String errMsg){
-        R r = new R();
-        r.setCode(code);
-        r.setMsg(errMsg);
-        return r;
+    public static <T> R<T> error(Integer code,String msg) {
+        return new R<T>(code, msg, null);
     }
+
+
 }

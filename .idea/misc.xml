@@ -8,6 +8,7 @@
         <option value="$PROJECT_DIR$/report/pom.xml" />
         <option value="$PROJECT_DIR$/gateway2/pom.xml" />
         <option value="$PROJECT_DIR$/commonutil/pom.xml" />
+        <option value="$PROJECT_DIR$/auth/pom.xml" />
       </list>
     </option>
   </component>

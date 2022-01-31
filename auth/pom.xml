@@ -7,9 +7,9 @@
         <artifactId>nfspeed</artifactId>
         <version>${nfspeed.version}</version>
     </parent>
-    <artifactId>report</artifactId>
-    <name>report</name>
-    <description>Demo project for Spring Boot</description>
+    <artifactId>auth</artifactId>
+    <name>auth</name>
+    <description>Auth project for Spring Boot</description>
 
     <dependencies>
         <dependency>
@@ -39,17 +39,31 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
-            <version>${hutool.version}</version>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-oauth2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.nimbusds</groupId>
+            <artifactId>nimbus-jose-jwt</artifactId>
+            <version>${jwt-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis-reactive</artifactId>
         </dependency>
         <dependency>
             <groupId>com.example</groupId>
             <artifactId>commonutil</artifactId>
             <version>${nfspeed.version}</version>
         </dependency>
-
-
     </dependencies>
 
     <build>
@@ -69,7 +83,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
                 <configuration>
-                    <mainClass>com.example.report.ReportApplication</mainClass>
+                    <mainClass>com.example.auth.AuthApplication</mainClass>
                 </configuration>
                 <executions>
                     <execution>
@@ -81,6 +95,23 @@
                 </executions>
             </plugin>
         </plugins>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <excludes>
+                    <exclude>**/*.jks</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>**/*.jks</include>
+                </includes>
+            </resource>
+        </resources>
     </build>
 
 

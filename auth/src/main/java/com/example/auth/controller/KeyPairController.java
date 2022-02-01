@@ -11,10 +11,6 @@ import java.security.KeyPair;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Map;
 
-/**
- * 获取RSA公钥接口
- * Created by macro on 2020/6/19.
- */
 @RestController
 @RequestMapping("/rsa")
 public class KeyPairController {

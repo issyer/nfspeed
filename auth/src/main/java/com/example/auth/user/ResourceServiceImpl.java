@@ -12,10 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-/**
- * 资源与角色匹配关系管理业务类
- * Created by macro on 2020/6/19.
- */
 @Service
 public class ResourceServiceImpl {
 

@@ -7,6 +7,7 @@ import com.example.gateway.component.RestAuthenticationEntryPoint;
 import com.example.gateway.component.RestfulAccessDeniedHandler;
 import com.example.gateway.filter.IgnoreUrlsRemoveJwtFilter;
 import lombok.AllArgsConstructor;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
@@ -21,10 +22,6 @@ import org.springframework.security.oauth2.server.resource.authentication.Reacti
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import reactor.core.publisher.Mono;
 
-/**
- * 资源服务器配置
- * Created by macro on 2020/6/19.
- */
 @AllArgsConstructor
 @Configuration
 @EnableWebFluxSecurity
@@ -36,6 +33,7 @@ public class ResourceServerConfig {
     private final IgnoreUrlsRemoveJwtFilter ignoreUrlsRemoveJwtFilter;
 
     @Bean
+    @RefreshScope
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         http.oauth2ResourceServer().jwt()
                 .jwtAuthenticationConverter(jwtAuthenticationConverter());

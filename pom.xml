@@ -41,6 +41,7 @@
         <hutool.version>4.5.16</hutool.version>
         <javamail.version>1.6.2</javamail.version>
         <jwt-version>8.16</jwt-version>
+        <minio-version>7.0.2</minio-version>
     </properties>
 
     <!--父级依赖管理-->

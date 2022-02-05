@@ -1,7 +1,7 @@
 package com.example.gateway.component;
 
 import cn.hutool.json.JSONUtil;
-import com.example.commonutil.util.request.R;
+import com.example.gateway.request.R;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

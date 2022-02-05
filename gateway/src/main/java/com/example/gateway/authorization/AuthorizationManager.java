@@ -1,8 +1,9 @@
 package com.example.gateway.authorization;
 
 import cn.hutool.core.convert.Convert;
-import com.example.commonutil.util.constant.AuthConstant;
-import com.example.commonutil.util.constant.RedisConstant;
+
+import com.example.gateway.constant.AuthConstant;
+import com.example.gateway.constant.RedisConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authorization.AuthorizationDecision;

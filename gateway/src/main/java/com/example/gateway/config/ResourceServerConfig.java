@@ -1,10 +1,10 @@
 package com.example.gateway.config;
 
 import cn.hutool.core.util.ArrayUtil;
-import com.example.commonutil.util.constant.AuthConstant;
 import com.example.gateway.authorization.AuthorizationManager;
 import com.example.gateway.component.RestAuthenticationEntryPoint;
 import com.example.gateway.component.RestfulAccessDeniedHandler;
+import com.example.gateway.constant.AuthConstant;
 import com.example.gateway.filter.IgnoreUrlsRemoveJwtFilter;
 import lombok.AllArgsConstructor;
 import org.springframework.cloud.context.config.annotation.RefreshScope;

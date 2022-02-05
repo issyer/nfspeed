@@ -1,6 +1,11 @@
 package com.example.commonutil.util.kuaidiniao;
 
 import cn.hutool.http.HttpUtil;
+import com.example.commonutil.util.config.KdnConfig;
+import lombok.AllArgsConstructor;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 import java.net.URLEncoder;
 import java.security.MessageDigest;
@@ -12,13 +17,9 @@ import java.util.Map;
  * @author SunWanghe
  * @date 2019/9/4 9:07
  */
+@AllArgsConstructor
+@Configuration
 public class KDNiao {
-
-	//用户id
-	private static String USERID = "1627815";
-
-	//用户的APIkey
-	private static String APIKEY = "e34ae063-b4b3-4acf-a948-21324d68ff13";
 
 	//查询物流信息的RUL，调用限制：3000 次/天，该地址需要的参数和返回结果如下：
 	/** 请求参数：
@@ -40,18 +41,19 @@ public class KDNiao {
 	 * Traces.AcceptStation：轨迹描述
 	 * Traces是一个json数组，
 	 */
-	private static String KD_QUERY_URL = "https://api.kdniao.com/Ebusiness/EbusinessOrderHandle.aspx";
 
 
-	public static String getTransportCompany(String logisticCode) throws Exception {
+	private final KdnConfig kdnConfig;
+
+	public String getTransportCompany(String logisticCode) throws Exception {
 
 		String requestData = "{'LogisticCode':'" + logisticCode + "'}";
 		String data = URLEncoder.encode(requestData, "UTF-8");
 
 		Base64.Encoder encoder = Base64.getEncoder();
-		String dataSign = encoder.encodeToString(MD5(requestData + APIKEY, "UTF-8").getBytes("UTF-8"));
-		String json = initJsonData(USERID, URLEncoder.encode(dataSign, "UTF-8"), data, "2002");
-		return HttpUtil.post(KD_QUERY_URL, json);
+		String dataSign = encoder.encodeToString(MD5(requestData + kdnConfig.getApiKey(), "UTF-8").getBytes("UTF-8"));
+		String json = initJsonData(kdnConfig.getUserId(), URLEncoder.encode(dataSign, "UTF-8"), data, "2002");
+		return HttpUtil.post(kdnConfig.getKdQueryUrl(), json);
 	}
 
 	/**
@@ -62,15 +64,16 @@ public class KDNiao {
 	 * @return 请求到的数据
 	 * @throws Exception
 	 */
-	public static String getOrderTraces(String memo, String code, String logisticCode) throws Exception {
+	public String getOrderTraces(String memo, String code, String logisticCode) throws Exception {
 
 		String requestData = "{'OrderCode':'','CustomerName':'" + memo + "','ShipperCode':'" + code + "','LogisticCode':'" + logisticCode + "'}";
 		String data = URLEncoder.encode(requestData, "UTF-8");
 
 		Base64.Encoder encoder = Base64.getEncoder();
-		String dataSign = encoder.encodeToString(MD5(requestData + APIKEY, "UTF-8").getBytes("UTF-8"));
-		String json = initJsonData(USERID, URLEncoder.encode(dataSign, "UTF-8"), data, "8001");
-		return HttpUtil.post(KD_QUERY_URL, json);
+		System.out.println(kdnConfig.getApiKey());
+		String dataSign = encoder.encodeToString(MD5(requestData + kdnConfig.getApiKey(), "UTF-8").getBytes("UTF-8"));
+		String json = initJsonData(kdnConfig.getUserId(), URLEncoder.encode(dataSign, "UTF-8"), data, "8001");
+		return HttpUtil.post(kdnConfig.getKdQueryUrl(), json);
 	}
 
 	/**
@@ -82,7 +85,7 @@ public class KDNiao {
 	 * @throws Exception
 	 */
 	@SuppressWarnings("unused")
-	private static String MD5(String str, String charset) throws Exception {
+	private String MD5(String str, String charset) throws Exception {
 		MessageDigest md = MessageDigest.getInstance("MD5");
 		md.update(str.getBytes(charset));
 		byte[] result = md.digest();
@@ -105,7 +108,7 @@ public class KDNiao {
 	 * @param data     数据内容
 	 * @return json字符串
 	 */
-	private static String initJsonData(String userid, String dataSign, String data, String instructNo) {
+	private String initJsonData(String userid, String dataSign, String data, String instructNo) {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("RequestData", data);//数据内容(URL 编码:UTF-8)
 		params.put("EBusinessID", userid);//用户的userid

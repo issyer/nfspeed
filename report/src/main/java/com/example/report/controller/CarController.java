@@ -4,6 +4,8 @@ import com.example.commonutil.util.kuaidiniao.KDNiao;
 import com.example.commonutil.util.minio.MinIoFileUtil;
 import com.example.commonutil.util.request.R;
 import com.example.report.entity.Car;
+import com.example.report.entity.User;
+import com.example.report.service.UserService;
 import io.minio.messages.Bucket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,17 +19,13 @@ import java.util.List;
 @RequestMapping("/car")
 public class CarController {
 
-    @Autowired
-    private MinIoFileUtil minIoFileUtil;
-
-    @Autowired
-    private KDNiao kdNiao;
-
+   @Autowired
+   private UserService userService;
 
     @RequestMapping("/list")
     public R searchData() throws Exception {
-        String result = kdNiao.getOrderTraces(null,"STO","773145780535205");
-        return R.ok(result);
+        List<User> userList = userService.selectUserList();
+        return R.ok(userList);
     }
 
 

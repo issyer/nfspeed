@@ -48,6 +48,7 @@
         <mysql-version>8.0.26</mysql-version>
         <mybatis-version>2.2.2</mybatis-version>
         <mybatis-plus-version>3.1.2</mybatis-plus-version>
+        <easypoi-version>4.1.0</easypoi-version>
     </properties>
 
     <!--父级依赖管理-->

@@ -7,8 +7,8 @@
         <artifactId>nfspeed</artifactId>
         <version>${nfspeed.version}</version>
     </parent>
-    <artifactId>report</artifactId>
-    <name>report</name>
+    <artifactId>admin</artifactId>
+    <name>admin</name>
     <description>Demo project for Spring Boot</description>
 
     <dependencies>
@@ -101,17 +101,16 @@
             </plugin>
         </plugins>
 
-<!--        <resources>-->
-<!--            <resource>-->
-<!--                <directory>src/main/java</directory>-->
-<!--                <includes>-->
-<!--                    <include>**/*.xml</include>-->
-<!--                </includes>-->
-<!--                <filtering>true</filtering>-->
-<!--            </resource>-->
-<!--        </resources>-->
+        <!--        <resources>-->
+        <!--            <resource>-->
+        <!--                <directory>src/main/java</directory>-->
+        <!--                <includes>-->
+        <!--                    <include>**/*.xml</include>-->
+        <!--                </includes>-->
+        <!--                <filtering>true</filtering>-->
+        <!--            </resource>-->
+        <!--        </resources>-->
 
     </build>
-
 
 </project>

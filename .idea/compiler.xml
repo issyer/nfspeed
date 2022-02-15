@@ -7,14 +7,16 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="report" />
-        <module name="nacos_server" />
         <module name="gateway" />
+        <module name="nacos_server" />
+        <module name="report" />
         <module name="auth" />
         <module name="commonutil" />
+        <module name="admin" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="admin" target="1.8" />
       <module name="auth" target="1.8" />
       <module name="common" target="1.8" />
       <module name="commonutil" target="1.8" />
@@ -27,6 +29,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="admin" options="-parameters" />
       <module name="auth" options="-parameters" />
       <module name="common" options="-parameters" />
       <module name="commonutil" options="-parameters" />

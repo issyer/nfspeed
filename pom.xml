@@ -23,6 +23,7 @@
         <module>gateway</module>
         <module>report</module>
         <module>auth</module>
+        <module>admin</module>
     </modules>
 
     <!--统一依赖版本号管理-->

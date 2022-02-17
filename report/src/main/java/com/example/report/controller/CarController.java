@@ -21,17 +21,23 @@ public class CarController {
    private UserService userService;
 
    @Autowired
-   private AdminFeign authFeign;
+   private AdminFeign adminFeign;
 
     @RequestMapping("/list")
     public R searchData() throws Exception {
         List<User> userList = userService.selectUserList();
-        return authFeign.getUserList();
+        return R.ok(userList);
     }
 
 
+    @RequestMapping("/userlist")
+    public R searchUserData()  {
+        return adminFeign.getUserList();
+    }
+
     @PostMapping("/save")
     public R saveCar(@RequestBody Car car){
+        userService.saveUser();
         return R.ok(car);
     }
 }

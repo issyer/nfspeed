@@ -1,7 +1,7 @@
-package com.example.report.service;
+package com.example.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.example.report.entity.User;
+import com.example.admin.entity.User;
 
 import java.util.List;
 

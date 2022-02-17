@@ -1,5 +1,6 @@
 package com.example.report;
 
+import io.seata.spring.annotation.datasource.EnableAutoDataSourceProxy;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.cloud.client.SpringCloudApplication;
@@ -11,6 +12,7 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan(basePackages = {"com.example.report","com.example.commonutil"})
 @MapperScan(basePackages = "com.example.report.mapper")
 @EnableFeignClients
+@EnableAutoDataSourceProxy
 public class ReportApplication {
 
     public static void main(String[] args) {

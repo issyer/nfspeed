@@ -1,0 +1,767 @@
+<template>
+	<view class="container">
+
+
+
+		<view class="header">
+			<view class="status" v-if="!connect">
+				<image style="width: 26rpx;height: 26rpx;margin-top: 34rpx;margin-left: 32rpx;float: left;"
+					:src="'../../static/image/unConnect.png'" mode="aspectFill"></image>
+				<view class="statusName" style="color: #FA6262;">脉搏血氧饱和度仪未连接</view>
+			</view>
+			<view class="status" v-if="connect">
+				<image style="width: 26rpx;height: 26rpx;margin-top: 34rpx;margin-left: 32rpx;float: left;"
+					:src="'../../static/image/connected.png'" mode="aspectFill"></image>
+				<view class="statusName" style="color: #2089E9;">脉搏血氧饱和度仪已连接</view>
+			</view>
+
+			<view class="value">
+				<view class="item rightItem">
+					<view class="name">血流灌注指数</view>
+					<view class="data">{{rightValue}}</view>
+				</view>
+				<view class="item leftItem">
+					<view class="name">血氧饱和度</view>
+					<view class="data">{{leftValue}}<text style="font-size: 24rpx;margin-left: 9rpx;">%</text></view>
+				</view>
+				<view class="item centerItem">
+					<view class="name">脉率</view>
+					<view class="data">{{centerValue}}<text style="font-size: 24rpx;margin-left: 9rpx;">bpm</text>
+					</view>
+				</view>
+
+			</view>
+		</view>
+		<view class="center">
+			<view class="charts">
+				<canvas id="mycanvas" canvas-id="mycanvas" style="width: 100%;height: 430rpx;"></canvas>
+				<!-- 				<canvas id="mycanvas" type="2d" style="width: 100%;height: 430rpx;"></canvas> -->
+			</view>
+			<view class="progress-box">
+				<progress :percent="progress" font-size="14" show-info stroke-width="12" activeColor="#036EFF"
+					backgroundColor="#E6E6E6" active="true" active-mode="forwards"
+					style="margin-left: 32rpx;margin-right: 32rpx;margin-top: 10rpx;" />
+			</view>
+		</view>
+		<view class="bottom">
+			<view class="title" v-if="finishStatus">
+				<view class="resultName" v-if="leftValue >= 95 && leftValue <= 99 ">您的脉搏血氧饱和度正常</view>
+				<view class="resultName" v-if="leftValue > 0 && leftValue < 95 " style="color: red;">您的脉搏血氧饱和度异常</view>
+				<view class="restart" @click="restart">重新测试</view>
+			</view>
+			<view class="history">
+				<view class="head">
+					<view class="thclass">时间</view>
+					<view class="thclass">血氧(%)</view>
+					<view class="thclass">PI(%)</view>
+					<view class="thclass">心跳(bpm)</view>
+				</view>
+				<scroll-view class="scrollClass" scroll-y="true" scroll-with-animation="true"
+					@scrolltolower="resetScrollTop" style="padding-bottom: 32rpx;">
+					<view v-for="(item,index) in historyList" :key="index">
+						<view class="itemContent">
+							<view class="tdclass">{{item.startTime}}</view>
+							<view class="tdclass" style="font-size: 30rpx;color: #2089E9;">{{item.spo2}}</view>
+							<view class="tdclass" style="font-size: 30rpx;color: #2089E9;">{{item.pi}}</view>
+							<view class="tdclass" style="font-size: 30rpx;color: #FA6262;">{{item.pr}}</view>
+						</view>
+						<view style="border: 1rpx #CCCCCC solid;"></view>
+					</view>
+					<view v-if="historyList.length === 0" class="noBodyClass">
+						<image class="nobodyImage" :src="'../../static/image/noBody.png'"></image>
+						<view class="nobodyText">还没有相关测量记录哦~</view>
+					</view>
+				</scroll-view>
+			</view>
+		</view>
+
+	</view>
+</template>
+
+<script>
+	import * as util from '@/common/util'
+	import request from '@/common/request'
+	export default {
+		data() {
+			return {
+				connect: false,
+				leftValue: 0,
+				centerValue: 0,
+				rightValue: 0,
+				discoveryStarted: false,
+				deviceId: '',
+				serviceId: '',
+				characteristicId: '',
+				progress: -5,
+				timer: null,
+				historyList: [],
+				page: {
+					current: 1,
+					size: 10,
+					total: 0,
+				},
+				waveList: [],
+				ctx: '',
+
+				lastPoint: {
+					x: 0,
+					y: 0,
+				},
+				currentPoint: {
+					x: 0,
+					y: 0,
+				},
+				eraser: {
+					x1: 0,
+					y1: 10,
+					x2: 0,
+					y2: 170.
+				},
+				interval: null,
+				finishStatus: false,
+				bloodOxygen:false,
+
+			};
+		},
+		onShow() {
+			this.bloodOxygen = true;
+			this.openBluetoothAdapter();
+			this.getHistoryList();
+			this.initChart();
+		},
+		onHide() {
+			clearInterval(this.interval);
+			this.connect = false;
+			this.discoveryStarted = false;
+			this.closeBLEConnection();
+		},
+		onUnload() {
+			clearInterval(this.interval);
+			this.connect = false;
+			this.discoveryStarted = false;
+			this.closeBLEConnection();
+		},
+		methods: {
+
+			restart() {
+
+				this.ctx.clearRect(0, 10, 340, 170);
+				this.drawHorizontalLine();
+				this.ctx.draw(true);
+				this.finishStatus = false;
+				this.progress = -5;
+				this.lastPoint = {
+						x: 0,
+						y: 0,
+					},
+					this.currentPoint = {
+						x: 0,
+						y: 0,
+					},
+					this.eraser = {
+						x1: 0,
+						y1: 10,
+						x2: 0,
+						y2: 170.
+					}
+				this.leftValue = 0;
+				this.centerValue = 0;
+				this.rightValue = 0;
+			},
+			initChart() {
+				this.createCanvas();
+				this.drawHorizontalLine();
+				this.ctx.draw(true);
+			},
+			createCanvas() {
+				//创建绘图对象
+				this.ctx = uni.createCanvasContext('mycanvas', this);
+				//设置画笔样式
+				this.ctx.lineWidth = 1;
+				this.ctx.lineCap = 'round';
+				this.ctx.lineJoin = 'round';
+			},
+			drawLine(x1, y1, x2, y2, color, width) {
+				this.ctx.beginPath()
+				this.ctx.moveTo(x1, y1);
+				this.ctx.lineTo(x2, y2);
+				this.ctx.setLineWidth(width)
+				this.ctx.setStrokeStyle(color)
+				this.ctx.stroke();
+			},
+			drawHorizontalLine() {
+				//横线
+				this.drawLine(0, 10, 340, 10, '#CCCCCC', 1);
+				this.drawLine(0, 30, 340, 30, '#CCCCCC', 1);
+				this.drawLine(0, 50, 340, 50, '#CCCCCC', 1); //15
+				this.drawLine(0, 70, 340, 70, '#CCCCCC', 1); //11
+				this.drawLine(0, 90, 340, 90, '#CCCCCC', 1); //7   中线，此时y坐标 90
+				this.drawLine(0, 110, 340, 110, '#CCCCCC', 1); //3
+				this.drawLine(0, 130, 340, 130, '#CCCCCC', 1);
+				this.drawLine(0, 150, 340, 150, '#CCCCCC', 1);
+				this.drawLine(0, 170, 340, 170, '#CCCCCC', 1);
+			},
+
+			getHistoryList() {
+				request.get(`/api/user/oxygenhistory`, {
+						size: this.page.size,
+						current: this.page.current,
+					})
+					.then((res) => {
+						this.historyList = res.data.records;
+						this.page.total = res.data.total;
+						this.page.current++;
+					});
+			},
+			resetScrollTop() {
+				request.get(`/api/user/oxygenhistory`, {
+						size: this.page.size,
+						current: this.page.current,
+					})
+					.then((res) => {
+						var newlist = res.data.records;
+						this.historyList = this.historyList.concat(newlist)
+						this.page.current++;
+					});
+			},
+			finish() {
+				request.post(`/api/user/oxygenhistory/save`, {
+						spo2: this.leftValue,
+						pi: this.rightValue,
+						pr: this.centerValue
+					})
+					.then((res) => {
+						if (res.code === 200) {
+							this.page.current = 1;
+							this.getHistoryList()
+						}
+					});
+			},
+			openBluetoothAdapter() {
+				if(!this.bloodOxygen){
+					return;
+				}
+				uni.openBluetoothAdapter({
+					success: res => {
+						if(!this.bloodOxygen){
+							return;
+						}
+						console.log('openBluetoothAdapter success', res);
+						this.startBluetoothDevicesDiscovery();
+					},
+					fail: res => {
+						if(!this.bloodOxygen){
+							return;
+						}
+						if (res.errCode === 10001) {
+							uni.showToast({
+								title: '请打开蓝牙',
+								icon: 'none'
+							});
+							uni.onBluetoothAdapterStateChange(res => {
+								if(!this.bloodOxygen){
+									return;
+								}
+								console.log('onBluetoothAdapterStateChange', res);
+								if (res.available) {
+									this.startBluetoothDevicesDiscovery();
+								}
+							});
+						}
+					}
+				});
+			},
+			startBluetoothDevicesDiscovery() {
+				if(!this.bloodOxygen){
+					return;
+				}
+				if (this.discoveryStarted) {
+					return;
+				}
+				this.discoveryStarted = true;
+				uni.startBluetoothDevicesDiscovery({
+					allowDuplicatesKey: true,
+					success: res => {
+						if(!this.bloodOxygen){
+							return;
+						}
+						console.log('startBluetoothDevicesDiscovery success', res);
+						this.onBluetoothDeviceFound();
+					}
+				});
+			},
+			onBluetoothDeviceFound() {
+				if(!this.bloodOxygen){
+					return;
+				}
+				uni.onBluetoothDeviceFound(res => {
+					if(!this.bloodOxygen){
+						return;
+					}
+					res.devices.forEach(device => {
+						if (device.name.indexOf('PC-60F') == -1) {
+							return;
+						}
+						this.createBLEConnection(device);
+					});
+				});
+			},
+			createBLEConnection(device) {
+				if(!this.bloodOxygen){
+					return;
+				}
+				const deviceId = device.deviceId;
+				uni.createBLEConnection({
+					deviceId,
+					success: res => {
+						//隐藏加载框
+						this.connect = true;
+						this.restart();
+						this.deviceId = deviceId;
+						this.getBLEDeviceServices(deviceId);
+					}
+				});
+				this.stopBluetoothDevicesDiscovery();
+			},
+			closeBLEConnection() {
+				if(!this.bloodOxygen){
+					return;
+				}
+				uni.closeBLEConnection({
+					deviceId: this.deviceId
+				});
+				this.connect = false;
+				this.bloodOxygen = false;
+			},
+			stopBluetoothDevicesDiscovery() {
+				if(!this.bloodOxygen){
+					return;
+				}
+				uni.stopBluetoothDevicesDiscovery();
+				this.discoveryStarted = false;
+			},
+			getBLEDeviceServices(deviceId) {
+				if(!this.bloodOxygen){
+					return;
+				}
+				uni.getBLEDeviceServices({
+					deviceId,
+					success: res => {
+						if(!this.bloodOxygen){
+							return;
+						}
+						console.log(res);
+						for (let i = 0; i < res.services.length; i++) {
+							if (res.services[i].isPrimary) {
+								this.getBLEDeviceCharacteristics(deviceId, res.services[i].uuid);
+								return;
+							}
+						}
+					}
+				});
+
+			},
+			getBLEDeviceCharacteristics(deviceId, serviceId) {
+				if(!this.bloodOxygen){
+					return;
+				}
+				uni.getBLEDeviceCharacteristics({
+					deviceId,
+					serviceId,
+					success: res => {
+						if(!this.bloodOxygen){
+							return;
+						}
+						console.log('getBLEDeviceCharacteristics success', res.characteristics);
+						for (let i = 0; i < res.characteristics.length; i++) {
+							let item = res.characteristics[i];
+							console.log(item.properties)
+							if (item.properties.read) {
+								uni.readBLECharacteristicValue({
+									deviceId,
+									serviceId,
+									characteristicId: item.uuid
+								});
+							}
+							if (item.properties.write) {
+								this.deviceId = deviceId;
+								this.serviceId = serviceId;
+								this.characteristicId = item.uuid;
+							}
+							if (item.properties.notify || item.properties.indicate) {
+								uni.notifyBLECharacteristicValueChange({
+									deviceId,
+									serviceId,
+									characteristicId: item.uuid,
+									state: true
+								});
+							}
+						}
+					},
+					fail(res) {
+						console.error('getBLEDeviceCharacteristics', res);
+					}
+				});
+				uni.onBLECharacteristicValueChange(characteristic => {
+					if(!this.bloodOxygen){
+						return;
+					}
+                    if(!this.connect){
+						return
+					}
+					var that = this;
+					if (this.connect && this.progress === -5) {
+						that.progress = that.progress + 5;
+						that.interval = setInterval(function() {
+							that.progress = that.progress + 5;
+							console.log(that.progress)
+							if (that.progress >= 100) {
+								that.finishStatus = true;
+								clearInterval(that.interval);
+								if (that.rightValue > 0) {
+									that.finish();
+									if (that.rightValue <= 2) {
+										uni.showModal({
+											title: '提示',
+											content: `您的血流灌注指数过低，请尽快做踝泵运动`,
+											success: (res) => {
+												if (res.confirm) {
+
+												}
+											}
+										});
+									}
+								}
+							}
+							//do whatever here..
+						}, 1500);
+					}
+
+					let value = util.ab2hex(characteristic.value);
+
+					var head = value.substring(0, 4);
+					var token = value.substring(4, 6);
+					var length = value.substring(6, 8); //长度=类型+数据+校验码，类型1位，校验码1位，数据长度：length-2
+					var type = value.substring(8, 10);
+					var length_10 = parseInt(length, 16)
+					var dataLength_10 = length_10 - 2;
+					if (head === 'aa55') {
+						if (token === 'f0') { //设备基本信息数据
+							if (type === '01') { //查询版本/名称
+
+							} else if (type === '02') { //查询设备序列号
+
+							} else if (type === '03') { //查询电池电量
+								var data = parseInt(value.substring(10, 10 + dataLength_10 * 2), 16)
+								console.log('电量为：' + data)
+								if (data === 0) {
+									uni.showToast({
+										title: '监测仪电量不足，请充电',
+										icon: 'none'
+									})
+								}
+							} else if (type === '21') { //查询蓝牙MAC地址
+								console.log('MAC地址为：' + value.substring(10))
+							}
+						} else if (token === '0f') { //测量数据
+							if (type === '01') { //查询血氧参数包
+								var data = value.substring(10, 10 + dataLength_10 * 2)
+								var Spo2 = parseInt(data.substring(0, 2), 16)
+								var PR_L = parseInt(data.substring(2, 4), 16)
+								var PR_H = parseInt(data.substring(4, 6), 16)
+								var PI = parseInt(data.substring(6, 8), 16)
+								var Status = parseInt(data.substring(8, 10), 16)
+								var Res = parseInt(data.substring(10, 12), 16)
+								this.leftValue = Spo2;
+								this.rightValue = (PI / 10).toFixed(1);
+								this.centerValue = PR_L + PR_H;
+								var status_2 = Status.toString(2);
+
+								if (status_2.length >= 2) {
+									if (status_2.substr(-2, 1) === '1' && this.interval != null) { //计时过程中探头脱落、手指未插入
+										this.finishStatus = true;
+										this.connect = false;
+										clearInterval(this.interval);
+										this.interval = null;
+										this.finish();
+									}
+								}
+
+							} else if (type === '02') { //查询血氧波形包
+								var data = value.substring(10, 10 + dataLength_10 * 2) //5个十六进制的波形数据
+								var Wave0 = parseInt(data.substring(0, 2), 16)
+								var Wave1 = parseInt(data.substring(2, 4), 16)
+								var Wave2 = parseInt(data.substring(4, 6), 16)
+								var Wave3 = parseInt(data.substring(6, 8), 16)
+								var Wave4 = parseInt(data.substring(8, 10), 16)
+								var Wave0_2 = Wave0.toString(2); //二进制波形数据
+								var Wave1_2 = Wave1.toString(2);
+								var Wave2_2 = Wave2.toString(2);
+								var Wave3_2 = Wave3.toString(2);
+								var Wave4_2 = Wave4.toString(2);
+
+								//二进制波形数据最高位代表脉搏搏动标志，0：无搏动，1：有搏动，所以二进制数据至少有8位才有效
+								//对8位二进制取后7位，范围为0-127，为了图形显示方便可以除以8
+								if (Wave0_2.length === 8) {
+									this.waveList.push(Math.floor(parseInt(Wave0_2.substring(1), 2) / 8))
+								} else {
+									this.waveList.push(Math.floor(parseInt(Wave0_2, 2) / 8))
+								}
+								if (Wave1_2.length === 8) {
+									this.waveList.push(Math.floor(parseInt(Wave1_2.substring(1), 2) / 8))
+								} else {
+									this.waveList.push(Math.floor(parseInt(Wave1_2, 2) / 8))
+								}
+								if (Wave2_2.length === 8) {
+									this.waveList.push(Math.floor(parseInt(Wave2_2.substring(1), 2) / 8))
+								} else {
+									this.waveList.push(Math.floor(parseInt(Wave2_2, 2) / 8))
+								}
+								if (Wave3_2.length === 8) {
+									this.waveList.push(Math.floor(parseInt(Wave3_2.substring(1), 2) / 8))
+								} else {
+									this.waveList.push(Math.floor(parseInt(Wave3_2, 2) / 8))
+								}
+								if (Wave4_2.length === 8) {
+									this.waveList.push(Math.floor(parseInt(Wave4_2.substring(1), 2) / 8))
+								} else {
+									this.waveList.push(Math.floor(parseInt(Wave4_2, 2) / 8))
+								}
+
+								for (var i = 0; i < this.waveList.length; i++) {
+									var realValue = this.waveList[i]
+									if (this.progress === 0 && i === 0) {
+										this.lastPoint.y = 53 + 5 * (15 - realValue)
+									}
+									this.currentPoint = {
+										x: this.lastPoint.x + 0.5,
+										y: 53 + 5 * (15 - realValue)
+									}
+									this.drawLine(this.lastPoint.x, this.lastPoint.y, this.currentPoint.x, this
+										.currentPoint.y, '#1F75FF', 1);
+									this.lastPoint = this.currentPoint;
+									if (this.lastPoint.x >= 340) {
+										this.ctx.clearRect(0, 10, 340, 170);
+										this.drawHorizontalLine();
+										this.ctx.draw(true);
+										this.lastPoint.x = 0;
+									}
+									this.eraser.x1 = this.lastPoint.x + 0.5;
+									this.eraser.x2 = this.lastPoint.x + 0.5;
+								}
+								this.ctx.draw(true);
+								this.waveList = [];
+							} else if (type === '20') { //原始采样红光/红外光频率 [用于信息调试]
+
+							} else if (type === '21') { //工作状态数据包
+
+							}
+						}
+					}
+
+
+				});
+				uni.onBLEConnectionStateChange(res => {
+					if(!this.bloodOxygen){
+						return;
+					}
+					// 该方法回调中可以用于处理连接意外断开等异常情况
+					console.log(`device ${res.deviceId} state has changed, connected: ${res.connected}`);
+					this.connect = res.connected;
+					if (!this.connect) {
+						this.discoveryStarted = false;
+						//this.finishStatus = true;
+						clearInterval(this.interval);
+						this.openBluetoothAdapter();
+					}
+
+				});
+			},
+
+
+		}
+	}
+</script>
+<style>
+	page {
+		background-color: #F1F1F1;
+	}
+</style>
+<style lang="scss" scoped>
+	.container {
+		padding-top: 20rpx;
+
+		.header {
+			width: 100%;
+			height: 290rpx;
+			background-color: white;
+
+			// display: flex;
+			// flex-direction: row;
+			.status {
+				display: flex;
+				flex-direction: row;
+
+				.statusName {
+					margin-top: 30rpx;
+					font-size: 26rpx;
+					margin-left: 12rpx;
+				}
+			}
+
+			.value {
+				display: flex;
+				flex-direction: row;
+				justify-content: space-between;
+				padding-left: 32rpx;
+				padding-right: 32rpx;
+				margin-top: 34rpx;
+
+				.item {
+					width: 220rpx;
+					height: 160rpx;
+					border-radius: 12rpx;
+
+					.name {
+						font-size: 28rpx;
+						color: white;
+						text-align: center;
+						margin-top: 20rpx;
+					}
+
+					.data {
+						font-size: 70rpx;
+						font-weight: bold;
+						color: white;
+						text-align: center;
+						margin-top: 9rpx;
+					}
+				}
+
+				.leftItem {
+					background-image: linear-gradient(to right, #34D698 0%, #00935B 100%);
+				}
+
+				.centerItem {
+					background-image: linear-gradient(to right, #FFBC52 0%, #E39619 100%);
+				}
+
+				.rightItem {
+					background-image: linear-gradient(to right, #F87373 0%, #D35454 100%);
+				}
+			}
+		}
+
+		.center {
+			margin-top: 20rpx;
+			width: 100%;
+			height: 500rpx;
+			background-color: white;
+
+			.charts {
+
+				height: 430rpx;
+				margin-left: 32rpx;
+				margin-right: 32rpx;
+				background-color: white;
+			}
+		}
+
+		.bottom {
+			margin-top: 20rpx;
+			background-color: white;
+			padding-left: 32rpx;
+			padding-right: 32rpx;
+			display: flex;
+			flex-direction: column;
+
+
+			.title {
+				margin-top: 28rpx;
+				display: flex;
+				flex-direction: row;
+				justify-content: space-between;
+
+
+				.resultName {
+					color: #666666;
+					font-size: 34rpx;
+					margin-top: 10rpx;
+				}
+
+				.restart {
+					width: 160rpx;
+					height: 66rpx;
+					border-radius: 50rpx;
+					color: white;
+					font-size: 28rpx;
+					background-image: linear-gradient(to right, #00ABFF 0%, #006BFF 100%);
+					text-align: center;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+				}
+			}
+
+			.history {
+				margin-top: 24rpx;
+
+				.head {
+					height: 70rpx;
+					display: flex;
+					flex-direction: row;
+					justify-content: space-between;
+					background-color: #F0F3F8;
+					font-size: 24rpx;
+
+					.thclass {
+						width: 25%;
+						text-align: center;
+						display: flex;
+						flex-direction: column;
+						justify-content: center;
+					}
+				}
+
+				.scrollClass {
+					height: 500rpx;
+				}
+
+				.itemContent {
+					height: 70rpx;
+					display: flex;
+					flex-direction: row;
+					justify-content: space-between;
+					font-size: 22rpx;
+					padding-top: 16rpx;
+					padding-bottom: 16rpx;
+
+					.tdclass {
+						width: 25%;
+						text-align: center;
+						display: flex;
+						flex-direction: column;
+						justify-content: center;
+					}
+				}
+
+				.noBodyClass {
+					.nobodyImage {
+						width: 557rpx;
+						height: 300rpx;
+						margin-left: 70rpx;
+					}
+
+					.nobodyText {
+						font-size: 40rpx;
+						color: #666666;
+						margin-left: 150rpx;
+						margin-top: 53rpx;
+
+					}
+				}
+			}
+		}
+
+	}
+</style>
